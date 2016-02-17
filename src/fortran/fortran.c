@@ -226,6 +226,9 @@ FORTRANIFY (shmem_put) (long *target, const long *source, int *size, int *pe)
     shmem_long_put (target, source, *size, *pe);
 }
 
+
+
+
 #ifdef HAVE_FEATURE_PSHMEM
 #pragma weak shmem_character_get_ = pshmem_character_get_
 #define shmem_character_get_ pshmem_character_get_
@@ -1311,4 +1314,38 @@ int FORTRANIFY (shmemx_quiet_test) (void)
     return shmemx_quiet_test ();
 }
 
+#ifdef HAVE_FEATURE_PSHMEM
+#pragma weak shmemx_am_attach_ = pshmemx_am_attach_
+#define shmemx_am_attach_ pshmemx_am_attach_
+#pragma weak shmemx_am_detach_ = pshmemx_am_detach_
+#define shmemx_am_detach_ pshmemx_am_detach_
+#pragma weak shmemx_am_launch_ = pshmemx_am_launch_
+#define shmemx_am_launch_ pshmemx_am_launch_
+#pragma weak shmemx_am_quiet_ = pshmemx_am_quiet_
+#define shmemx_am_quiet_ pshmemx_am_quiet_
+#endif /* HAVE_FEATURE_PSHMEM */
+
+void FORTRANIFY(shmemx_am_attach) (int* function_id, shmemx_am_handler* function_handler)
+{
+    shmemx_am_attach (*function_id, *function_handler);
+}
+
+void FORTRANIFY (shmemx_am_detach) (int* function_id)
+{
+    shmemx_am_detach (*function_id);
+}
+
+void FORTRANIFY(shmemx_am_launch )(int* dest, int* handler_id, void* source_addr, size_t* nbytes)
+{
+    shmemx_am_launch(*dest, *handler_id, source_addr, *nbytes);
+}
+
+
+void FORTRANIFY(shmemx_am_quiet) ()
+{
+    shmemx_am_quiet();
+}
+
 #endif /* HAVE_FEATURE_EXPERIMENTAL */
+
+

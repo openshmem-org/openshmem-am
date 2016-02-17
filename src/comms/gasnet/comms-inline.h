@@ -605,6 +605,11 @@ enum
     GASNET_HANDLER_globalvar_get_out,
     GASNET_HANDLER_globalvar_get_bak,
 
+#if defined(HAVE_FEATURE_EXPERIMENTAL)
+    GASNET_HANDLER_activemsg_request_handler,
+    GASNET_HANDLER_activemsg_reply_handler,
+#endif /* HAVE_FEATURE_EXPERIMENTAL */
+
     GASNET_HANDLER_globalexit_out
     /* no reply partner for global_exit */
 };
@@ -2101,6 +2106,35 @@ shmemi_comms_globalvar_get_request (void *target, void *source,
 
 #endif /* HAVE_MANAGED_SEGMENTS */
 
+
+#if defined(HAVE_FEATURE_EXPERIMENTAL) 
+extern struct shmemx_am_handler2id_map *am_maphashptr;
+extern int volatile request_cnt;
+
+typedef void (*shmemx_am_handler)  (void *buf, size_t nbytes, int req_pe);
+struct shmemx_am_handler2id_map {
+	     int id; /* user defined handler */
+	          shmemx_am_handler fn_ptr;
+		       UT_hash_handle hh;
+};
+
+static inline void
+handler_activemsg_request(gasnet_token_t token, void *buf, size_t nbytes, gasnet_handlerarg_t handler_id, gasnet_handlerarg_t req_pe)
+{
+    struct shmemx_am_handler2id_map* temp_handler_entry;
+    HASH_FIND_INT( am_maphashptr, &handler_id, temp_handler_entry );
+    temp_handler_entry->fn_ptr(buf, nbytes, req_pe);
+    GASNET_SAFE(gasnet_AMReplyShort0 (token, GASNET_HANDLER_activemsg_reply_handler));
+}
+
+static inline void 
+handler_activemsg_reply (gasnet_token_t token)
+{
+	        request_cnt--;
+}
+#endif /* HAVE_FEATURE_EXPERIMENTAL */
+
+
 /**
  * ---------------------------------------------------------------------------
  */
@@ -2561,6 +2595,12 @@ static gasnet_handlerentry_t handlers[] = {
     {GASNET_HANDLER_globalvar_get_out, handler_globalvar_get_out},
     {GASNET_HANDLER_globalvar_get_bak, handler_globalvar_get_bak},
 #endif /* HAVE_MANAGED_SEGMENTS */
+
+#if defined(HAVE_FEATURE_EXPERIMENTAL) 
+    {GASNET_HANDLER_activemsg_request_handler, handler_activemsg_request},
+    {GASNET_HANDLER_activemsg_reply_handler, handler_activemsg_reply},
+#endif /* HAVE_FEATURE_EXPERIMENTAL */
+
     {GASNET_HANDLER_globalexit_out, handler_globalexit_out}
     /* no reply partner for global_exit */
 };

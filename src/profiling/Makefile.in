@@ -57,6 +57,7 @@ COLL_CPPFLAGS    =    -I../barrier \
                         -I../broadcast \
                         -I../collect \
                         -I../fcollect
+ACTIVEMSG_CPPFLAGS =   -I../activemsg
 
 # ---------------------------------------------------------
 
@@ -100,6 +101,7 @@ CPPFLAGS        += $(ATOMIC_CPPFLAGS)
 CPPFLAGS        += $(GLOBALVAR_CPPFLAGS)
 CPPFLAGS        += $(MALLOC_CPPFLAGS)
 CPPFLAGS        += $(COLL_CPPFLAGS)
+CPPFLAGS        += $(ACTIVEMSG_CPPFLAGS)
 
 CFLAGS          += @PICFLAGS@
 CFLAGS          += @WARNFLAGS@

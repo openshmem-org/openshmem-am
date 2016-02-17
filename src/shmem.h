@@ -861,7 +861,7 @@ extern "C"
      void *shmalloc (size_t size);
      @endcode
      *
-     * @param size numer of bytes requested
+     * @param size number of bytes requested
      *
      * @section Effect
      *

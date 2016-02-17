@@ -6,11 +6,6 @@
 #  by Silicon Graphics International Corp. (SGI) The OpenSHMEM API
 #  (shmem) is released by Open Source Software Solutions, Inc., under an
 #  agreement with Silicon Graphics International Corp. (SGI).
-# Copyright (c) 2009 - 2016
-#  Silicon Graphics International Corp.  SHMEM is copyrighted
-#  by Silicon Graphics International Corp. (SGI) The OpenSHMEM API
-#  (shmem) is released by Open Source Software Solutions, Inc., under an
-#  agreement with Silicon Graphics International Corp. (SGI).
 #
 # All rights reserved.
 #
@@ -62,6 +57,7 @@ COLL_CPPFLAGS    =    -I../barrier \
                         -I../broadcast \
                         -I../collect \
                         -I../fcollect
+ACTIVEMSG_CPPFLAGS =   -I../activemsg
 
 # ---------------------------------------------------------
 
@@ -105,6 +101,7 @@ CPPFLAGS        += $(ATOMIC_CPPFLAGS)
 CPPFLAGS        += $(GLOBALVAR_CPPFLAGS)
 CPPFLAGS        += $(MALLOC_CPPFLAGS)
 CPPFLAGS        += $(COLL_CPPFLAGS)
+CPPFLAGS        += $(ACTIVEMSG_CPPFLAGS)
 
 CFLAGS          += @PICFLAGS@
 CFLAGS          += @WARNFLAGS@
