@@ -607,8 +607,8 @@ enum
 
 #if defined(HAVE_FEATURE_EXPERIMENTAL)
     /* Active Messages Support */
-    GASNET_HANDLER_activemsg_request_handler_1sided,
-    GASNET_HANDLER_activemsg_reply_handler_1sided,
+    GASNET_HANDLER_activemsg_request_handler,
+    GASNET_HANDLER_activemsg_reply_handler,
 #endif /* HAVE_FEATURE_EXPERIMENTAL */
 
     GASNET_HANDLER_globalexit_out
@@ -2142,31 +2142,29 @@ shmemi_comms_globalvar_get_request (void *target, void *source,
 #if defined(HAVE_FEATURE_EXPERIMENTAL) 
 /* Active Messages Support */
 
-typedef void (*shmemx_am_1sided_handler)  (void *buf, size_t nbytes, int req_pe);
-
 struct shmemx_am_handler2id_map {
 	     int id; /* user defined handler */
-             shmemx_am_1sided_handler fn_1sided_ptr;
+             shmemx_am_handler fn_ptr;
              UT_hash_handle hh;
 };
 extern struct shmemx_am_handler2id_map *am_maphashptr;
 extern int volatile request_cnt;
 
 static inline void
-handler_activemsg_request_1sided(gasnet_token_t token, 
+handler_activemsg_request(gasnet_token_t token, 
 				void *buf, size_t nbytes, 
 				gasnet_handlerarg_t handler_id, 
 				gasnet_handlerarg_t req_pe)
 {
     struct shmemx_am_handler2id_map* temp_handler_entry;
     HASH_FIND_INT( am_maphashptr, &handler_id, temp_handler_entry );
-    temp_handler_entry->fn_1sided_ptr(buf, nbytes, req_pe);
+    temp_handler_entry->fn_ptr(buf, nbytes, req_pe);
     GASNET_SAFE(gasnet_AMReplyShort0 (token, 
-			              GASNET_HANDLER_activemsg_reply_handler_1sided));
+			              GASNET_HANDLER_activemsg_reply_handler));
 }
 
 static inline void 
-handler_activemsg_reply_1sided (gasnet_token_t token)
+handler_activemsg_reply (gasnet_token_t token)
 {
     request_cnt--;
     // atomic_dec_am_counter();
@@ -2636,8 +2634,8 @@ static gasnet_handlerentry_t handlers[] = {
 #endif /* HAVE_MANAGED_SEGMENTS */
 
 #if defined(HAVE_FEATURE_EXPERIMENTAL) 
-    {GASNET_HANDLER_activemsg_request_handler_1sided, handler_activemsg_request_1sided},
-    {GASNET_HANDLER_activemsg_reply_handler_1sided, handler_activemsg_reply_1sided},
+    {GASNET_HANDLER_activemsg_request_handler, handler_activemsg_request},
+    {GASNET_HANDLER_activemsg_reply_handler, handler_activemsg_reply},
 #endif /* HAVE_FEATURE_EXPERIMENTAL */
 
     {GASNET_HANDLER_globalexit_out, handler_globalexit_out}
