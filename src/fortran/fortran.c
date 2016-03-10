@@ -1325,17 +1325,17 @@ int FORTRANIFY (shmemx_quiet_test) (void)
 #define shmemx_am_quiet_ pshmemx_am_quiet_
 #endif /* HAVE_FEATURE_PSHMEM */
 
-void FORTRANIFY(shmemx_am_attach) (int* function_id, shmemx_am_handler* function_handler)
+void FORTRANIFY(shmemx_am_attach) (int* function_id, shmemx_am_handler_w_token* function_handler)
 {
     shmemx_am_attach (*function_id, *function_handler);
 }
 
-void FORTRANIFY (shmemx_am_detach) (int* function_id)
+void FORTRANIFY(shmemx_am_detach) (int* function_id)
 {
     shmemx_am_detach (*function_id);
 }
 
-void FORTRANIFY(shmemx_am_launch )(int* dest, int* handler_id, void* source_addr, size_t* nbytes)
+void FORTRANIFY(shmemx_am_launch)(int* dest, int* handler_id, void* source_addr, size_t* nbytes)
 {
     shmemx_am_launch(*dest, *handler_id, source_addr, *nbytes);
 }

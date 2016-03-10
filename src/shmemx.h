@@ -391,29 +391,38 @@ extern "C"
 
 
     /**
-     * @brief 
+     * @brief Active Messages in OpenSHMEM
      * attach - This routine checks dynamically registers a user defined 
-     * routine as an active message handler. There is an implicit barrier 
-     * at the end of this routine.
+     *                 routine as an active message handler. There is an implicit barrier 
+     *                 at the end of this routine.
      * detach - This routine deregisters a previously registered routine.
-     * launch - This routine launches an active message on a remote PE
-     * quiet - This routine ensures the completion of all pending
-     * active messages initiated by the executing PE.
+     * launch        - This routine launches an active message on a remote PE
+     * quiet         - This routine ensures the completion of all pending
+     *                 active messages initiated by the executing PE.
      *
      * @section Synopsis:
      *
      * @substitute c C/C++ @code
-     void shmemx_am_attach (int* function_id, shmemx_am_handler* function_handler);
+     void shmemx_am_attach (int* function_id, shmemx_am_handler_w_token* function_handler);
      * @endcode
      *
      *
      */
     
-   typedef void (*shmemx_am_handler)  (void *buf, size_t nbytes, int req_pe);
-   void shmemx_am_attach (int function_id, shmemx_am_handler function_handler);
-   void shmemx_am_detach (int function_id);
-   void shmemx_am_launch (int dest, int handler_id, void* source_addr, size_t nbytes);
-   void shmemx_am_quiet ();
+     typedef struct {
+  	void* gasnet_token;
+  	int is_reply_called;
+     }* shmemx_am_token_t;
+     typedef void (*shmemx_am_handler_w_token) 
+	     (void *buf, size_t nbytes, int req_pe, shmemx_am_token_t token);
+  
+  
+     void shmemx_am_attach (int function_id, shmemx_am_handler_w_token function_handler);
+     void shmemx_am_detach (int function_id); 
+     void shmemx_am_request (int dest, int handler_id, void* source_addr, size_t nbytes);
+     void shmemx_am_reply (int handler_id, void* source_addr, size_t nbytes, 
+			   shmemx_am_token_t temp_token);
+     void shmemx_am_quiet ();
 
 
 #ifdef __cplusplus
