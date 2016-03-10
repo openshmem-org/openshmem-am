@@ -59,12 +59,12 @@ struct shmemx_am_handler2id_map *am_maphashptr=NULL;
 volatile int request_cnt = 0;
 
 void 
-shmemx_am_attach (int function_id, shmemx_am_handler function_handler)
+shmemx_am_attach_1sided (int function_id, shmemx_am_1sided_handler function_handler)
 {
    struct shmemx_am_handler2id_map* temp_handler_entry;
    temp_handler_entry = (struct shmemx_am_handler2id_map*) malloc(sizeof(struct shmemx_am_handler2id_map));
    temp_handler_entry->id = function_id;
-   temp_handler_entry->fn_ptr = function_handler;
+   temp_handler_entry->fn_1sided_ptr = function_handler;
    HASH_ADD_INT(am_maphashptr, id, temp_handler_entry);
    /* shmem attach is a collective operation */
    shmem_barrier_all();
@@ -85,8 +85,9 @@ void
 shmemx_am_launch(int dest, int handler_id, void* source_addr, size_t nbytes)
 {
    request_cnt++;
+   //atomic_inc_am_counter();
    GASNET_SAFE(gasnet_AMRequestMedium2 
-		   (dest, GASNET_HANDLER_activemsg_request_handler, 
+		   (dest, GASNET_HANDLER_activemsg_request_handler_1sided, 
 		    source_addr, nbytes, handler_id, 
 		    shmem_my_pe()));
 }
@@ -96,6 +97,7 @@ void
 shmemx_am_quiet()
 {
    GASNET_BLOCKUNTIL(request_cnt==0);
+   //atomic_wait_am_zero();
 }
 
 
