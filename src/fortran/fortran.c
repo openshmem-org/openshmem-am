@@ -1319,10 +1319,14 @@ int FORTRANIFY (shmemx_quiet_test) (void)
 #define shmemx_am_attach_ pshmemx_am_attach_
 #pragma weak shmemx_am_detach_ = pshmemx_am_detach_
 #define shmemx_am_detach_ pshmemx_am_detach_
-#pragma weak shmemx_am_launch_ = pshmemx_am_launch_
-#define shmemx_am_launch_ pshmemx_am_launch_
+#pragma weak shmemx_am_request_ = pshmemx_am_request_
+#define shmemx_am_request_ pshmemx_am_request_
+#pragma weak shmemx_am_reply_ = pshmemx_am_reply_
+#define shmemx_am_reply_ pshmemx_am_reply_
 #pragma weak shmemx_am_quiet_ = pshmemx_am_quiet_
 #define shmemx_am_quiet_ pshmemx_am_quiet_
+#pragma weak shmemx_am_poll_ = pshmemx_am_poll_
+#define shmemx_am_poll_ pshmemx_am_poll_
 #endif /* HAVE_FEATURE_PSHMEM */
 
 void FORTRANIFY(shmemx_am_attach) (int* function_id, shmemx_am_handler_w_token* function_handler)
@@ -1335,15 +1339,26 @@ void FORTRANIFY(shmemx_am_detach) (int* function_id)
     shmemx_am_detach (*function_id);
 }
 
-void FORTRANIFY(shmemx_am_launch)(int* dest, int* handler_id, void* source_addr, size_t* nbytes)
+void FORTRANIFY(shmemx_am_request)(int* dest, int* handler_id, void* source_addr, size_t* nbytes)
 {
-    shmemx_am_launch(*dest, *handler_id, source_addr, *nbytes);
+    shmemx_am_request(*dest, *handler_id, source_addr, *nbytes);
 }
 
+//TODO check the syntax for dealing with function
+//     references in Fortran
+void FORTRANIFY(shmemx_am_reply)(int* handler_id, void* source_addr, size_t* nbytes, shmemx_am_token_t temp_token)
+{
+    shmemx_am_request(*handler_id, source_addr, *nbytes, temp_token);
+}
 
 void FORTRANIFY(shmemx_am_quiet) ()
 {
     shmemx_am_quiet();
+}
+
+void FORTRANIFY(shmemx_am_poll) ()
+{
+    shmemx_am_poll();
 }
 
 #endif /* HAVE_FEATURE_EXPERIMENTAL */

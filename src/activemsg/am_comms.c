@@ -115,4 +115,10 @@ shmemx_am_quiet()
 }
 
 
+void 
+shmemx_am_poll()
+{
+   gasnet_AMPoll();
+}
+
 #endif /* HAVE_FEATURE_EXPERIMENTAL */

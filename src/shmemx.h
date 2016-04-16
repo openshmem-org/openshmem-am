@@ -423,6 +423,7 @@ extern "C"
      void shmemx_am_reply (int handler_id, void* source_addr, size_t nbytes, 
 			   shmemx_am_token_t temp_token);
      void shmemx_am_quiet ();
+     void shmemx_am_poll ();
 
 
 #ifdef __cplusplus
