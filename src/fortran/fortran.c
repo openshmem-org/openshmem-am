@@ -1323,6 +1323,8 @@ int FORTRANIFY (shmemx_quiet_test) (void)
 #define shmemx_am_launch_ pshmemx_am_launch_
 #pragma weak shmemx_am_quiet_ = pshmemx_am_quiet_
 #define shmemx_am_quiet_ pshmemx_am_quiet_
+#pragma weak shmemx_am_poll_ = pshmemx_am_poll_
+#define shmemx_am_poll_ pshmemx_am_poll_
 #endif /* HAVE_FEATURE_PSHMEM */
 
 void FORTRANIFY(shmemx_am_attach) (int* function_id, shmemx_am_handler* function_handler)
@@ -1330,7 +1332,7 @@ void FORTRANIFY(shmemx_am_attach) (int* function_id, shmemx_am_handler* function
     shmemx_am_attach (*function_id, *function_handler);
 }
 
-void FORTRANIFY (shmemx_am_detach) (int* function_id)
+void FORTRANIFY(shmemx_am_detach) (int* function_id)
 {
     shmemx_am_detach (*function_id);
 }
@@ -1344,6 +1346,11 @@ void FORTRANIFY(shmemx_am_launch )(int* dest, int* handler_id, void* source_addr
 void FORTRANIFY(shmemx_am_quiet) ()
 {
     shmemx_am_quiet();
+}
+
+void FORTRANIFY(shmemx_am_poll) ()
+{
+    shmemx_am_poll();
 }
 
 #endif /* HAVE_FEATURE_EXPERIMENTAL */
