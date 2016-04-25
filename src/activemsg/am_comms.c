@@ -63,9 +63,15 @@ void
 shmemx_am_attach (int function_id, shmemx_am_handler_w_token function_handler)
 {
    struct shmemx_am_handler2id_map* temp_handler_entry;
+   struct shmemx_am_handler2id_map* temp_entry;
    temp_handler_entry = (struct shmemx_am_handler2id_map*) malloc(sizeof(struct shmemx_am_handler2id_map));
    temp_handler_entry->id = function_id;
    temp_handler_entry->fn_ptr = function_handler;
+   HASH_FIND_INT(am_maphashptr, &function_id, temp_entry);
+   if(temp_entry!=NULL) {
+	   fprintf(stderr,"*****Error, handler id%d already registered\n",function_id);
+   	   exit(-1);
+   }
    HASH_ADD_INT(am_maphashptr, id, temp_handler_entry);
    /* shmem attach is a collective operation */
    shmem_barrier_all();
@@ -120,5 +126,28 @@ shmemx_am_poll()
 {
    gasnet_AMPoll();
 }
+
+
+#define MAX_HSL_CNT 100
+gasnet_hsl_t gasnet_hsl_arr[MAX_HSL_CNT];
+static int shmemx_am_mutex_counter=-1;
+typedef int shmemx_am_mutex;
+
+#define SHMEM2GASNET_HSL(op,ret)\
+ret shmemx_am_mutex_##op(shmemx_am_mutex* index) \
+{ \
+   return gasnet_hsl_##op(&gasnet_hsl_arr[*index]); \
+}
+
+void shmemx_am_mutex_init(shmemx_am_mutex* index)
+{
+   *index = ++shmemx_am_mutex_counter;
+   gasnet_hsl_init(&gasnet_hsl_arr[*index]);
+}
+
+SHMEM2GASNET_HSL(destroy,void)
+SHMEM2GASNET_HSL(lock,void)
+SHMEM2GASNET_HSL(unlock,void)
+SHMEM2GASNET_HSL(trylock,int)
 
 #endif /* HAVE_FEATURE_EXPERIMENTAL */

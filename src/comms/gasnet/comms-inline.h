@@ -2180,10 +2180,12 @@ handler_activemsg_reply (gasnet_token_t token,
 				gasnet_handlerarg_t req_pe)
 {
     struct shmemx_am_handler2id_map* temp_handler_entry;
-    HASH_FIND_INT( am_maphashptr, &handler_id, temp_handler_entry );
-    shmemx_am_token_t temp_token = malloc(sizeof(*temp_token));
-    temp_token->gasnet_token = token;
-    temp_handler_entry->fn_ptr(buf, nbytes, req_pe, temp_token);
+    if (handler_id != -1) {
+        HASH_FIND_INT( am_maphashptr, &handler_id, temp_handler_entry );
+        shmemx_am_token_t temp_token = malloc(sizeof(*temp_token));
+        temp_token->gasnet_token = token;
+        temp_handler_entry->fn_ptr(buf, nbytes, req_pe, temp_token);
+    }
     request_cnt--;
 }
 
