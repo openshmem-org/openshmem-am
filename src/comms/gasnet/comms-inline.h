@@ -1776,12 +1776,6 @@ static volatile unsigned long get_counter = 0L;
 static gasnet_hsl_t put_counter_lock = GASNET_HSL_INITIALIZER;
 static gasnet_hsl_t get_counter_lock = GASNET_HSL_INITIALIZER;
 
-#if defined(HAVE_FEATURE_EXPERIMENTAL)
-static volatile unsigned long am_counter = 0L;
-static gasnet_hsl_t am_counter_lock = GASNET_HSL_INITIALIZER;
-#endif /* HAVE_FEATURE_EXPERIMENTAL */
-
-
 static inline void
 atomic_inc_put_counter (void)
 {
@@ -1826,21 +1820,11 @@ atomic_wait_get_zero (void)
     WAIT_ON_COMPLETION (get_counter == 0L);
 }
 
-#else /* ! HAVE_MANAGED_SEGMENTS */
-
-#define atomic_inc_put_counter()
-#define atomic_dec_put_counter()
-
-#define atomic_inc_get_counter()
-#define atomic_dec_get_counter()
-
-#define atomic_wait_put_zero()
-#define atomic_wait_get_zero()
-
-#endif /* HAVE_MANAGED_SEGMENTS */
-
 #if defined(HAVE_FEATURE_EXPERIMENTAL)
 /* Active Message Support */
+static volatile unsigned long am_counter = 0L;
+static gasnet_hsl_t am_counter_lock = GASNET_HSL_INITIALIZER;
+
 static inline void
 atomic_inc_am_counter(void)
 {
@@ -1862,7 +1846,29 @@ atomic_wait_am_zero (void)
 {
     WAIT_ON_COMPLETION (am_counter == 0L);
 }
+
 #endif /* HAVE_FEATURE_EXPERIMENTAL */
+
+#else /* ! HAVE_MANAGED_SEGMENTS */
+
+#define atomic_inc_put_counter()
+#define atomic_dec_put_counter()
+
+#define atomic_inc_get_counter()
+#define atomic_dec_get_counter()
+
+#define atomic_wait_put_zero()
+#define atomic_wait_get_zero()
+
+#if defined(HAVE_FEATURE_EXPERIMENTAL)
+/* Active Message Support */
+#define atomic_inc_am_counter()
+#define atomic_dec_am_counter()
+#define atomic_wait_am_zero()
+#endif /* HAVE_FEATURE_EXPERIMENTAL */
+
+#endif /* HAVE_MANAGED_SEGMENTS */
+
 
 
 /**
@@ -2187,6 +2193,7 @@ handler_activemsg_reply (gasnet_token_t token,
         temp_handler_entry->fn_ptr(buf, nbytes, req_pe, temp_token);
     }
     request_cnt--;
+    atomic_dec_am_counter();
 }
 
 #endif /* HAVE_FEATURE_EXPERIMENTAL */
